@@ -21,7 +21,7 @@ FOLD_MAPPING = {
     4: [0,1,2,3]
 }
 
-
+# TO DO: refactor it as train()
 if __name__ == "__main__":
     df = pd.read_csv(TRAINING_DATA)
     df_test = pd.read_csv(TEST_DATA)
@@ -45,6 +45,13 @@ if __name__ == "__main__":
         valid_df.loc[:,c] = valid_df.loc[:,c].astype(str).fillna("NONE")
         df_test.loc[:,c] = df_test.loc[:,c].astype(str).fillna("NONE") 
         #fit
+
+        #Label encoder will fail if you have new labels. so, proper way of doing this would be 
+        # to add a  "new" label to training labels and fitting the encoder. this way,
+        #  all new labels in validation or test set will become "new". im not sure how it 
+        # will perform. what im doing is a kind of semi-supervised learning. 
+        # it may cause data leakage if you do target encoding or similar things
+
         lbl.fit(train_df[c].values.tolist()+
                 valid_df[c].values.tolist()+
                 df_test[c].values.tolist())

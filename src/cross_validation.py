@@ -30,9 +30,10 @@ class CrossValidation:
                 multilabel_delimiter = ",",
                 num_folds=5,
                 random_state=42
-    ):
+        ):
 
         self.dataframe = df 
+        #list of col names
         self.target_cols = target_cols 
         self.num_targets = len(target_cols)
         self.problem_type = problem_type
@@ -44,33 +45,32 @@ class CrossValidation:
         if self.shuffle is True:
             self.dataframe = self.dataframe.sample(frac=1).reset_index(drop=True)
 
-        #create a new col and initialize with the 
         self.dataframe["kfold"] = -1 
-
-    #Remarks: Kfold regression: only X split whereas, KFold classification both X and y split.
+        #----------------------------------------------------------------------------------------
+        #  Remarks: Kfold : only X split whereas, StratifiedKFold needs both X and y split.
+        #  It is good idea to have stratified classification here to ensure that the ratio of postive
+        #  to negative value stays the same.
+        #kf.split() is a generator that generates train_index and valid index
+        #----------------------------------------------------------------------------------------
     def split(self):
         if self.problem_type in ("binary_classification", "multiclass_classification"):
             if self.num_targets != 1:
                 raise Exception("Invalid number of target for this problem type")
-
             target = self.target_cols[0]
-            #count the unique values
             unique_values = self.dataframe[target].nunique()
             if unique_values == 1:
                 raise Exception ("only one value is found")
             elif unique_values >1:
-            #It is good idea to have stratified classification here to ensure that the ratio of postive
-            # to negative value stays the same.
                 kf = model_selection.StratifiedKFold(n_splits=self.num_folds,
                                                     shuffle=False)
-                
                 for fold, (train_idx, val_idx) in enumerate(kf.split(X=self.dataframe,
                                                                     y=self.dataframe[target].values,
                                                                      )):
                     self.dataframe.loc[val_idx, 'kfold'] = fold
 
-        elif self.problem_type in ("single_col_regression". "multi_col_regression"):
-            if num_targets != 1 and self.problem_type == "single_col_regression":
+        #----------------------------------------------------------------------------------------
+        elif self.problem_type in ("single_col_regression", "multi_col_regression"):
+            if self.num_targets != 1 and self.problem_type == "single_col_regression":
                 raise Exception("Invalid num of traget for this type of problem")
             if self.num_targets <2  and self.problem_type =="multiclass_classification":
                 raise Exception("Invalid num of traget for this type of problem")
@@ -80,17 +80,36 @@ class CrossValidation:
                 for fold, (train_idx, val_idx) in enumerate(kf.split(X=self.dataframe)):
                     self.dataframe[val_idx, "kfold"] = fold
 
+        #----------------------------------------------------------------------------------------------
+        #Holdout is very important when you have time series data.
+        #In timeseries if you use k-fold, you will be using data from future timestamp. It is 
+        #not a good idea. It will overfit your model and you will get really nice validation score
+        #but it doesnot mean anything.
 
+        #When you have millions of dataset, then you can use holdout set. It is very 
+        #expensive to do 5/10 fold cross validation with such a large dataset. The best way is to 
+        #use holdout set in such condition.
+
+        #In this case you really do not care about if it is reagression or classification.
+
+        #EG: holdout_5, holdout_10 
+        #--------------------------------------------------------------------------------------
         elif self.problem_type.startswith("holdout_"):
             holdout_percentage = int(self.problem_type.split(" ")[1])
             num_holdout_samples = int(len(self.dataframe)*holdout_percentage/100)
-            # TODO: investigate
+
             self.dataframe.loc[:len(self.dataframe) - num_holdout_samples, "kfold"] =0
+
+            #this is holdout set
             self.dataframe.loc[len(self.dataframe) - num_holdout_samples:, "kfold"] = 1
 
+        #--------------------------------------------------------------------------------------
+        #Each sample can have more than one labels. 
+        #Example: you have an image and it has multiple objects in it.
+        #a single target column should has multiple labls with a delimiter. 
+        #--------------------------------------------------------------------------------------
         elif self.problem_type == "multilabel_classification":
-            #Each sample can have more than one labels. 
-
+        
             if self.num_targets != 1:
                 raise Exception ("Invalid num of traget for this type of problem ")
             targets = self.dataframe[self.target_cols[0]].apply(lambda x: len(str(x).split(self.multilabel_delimiter)))
@@ -98,12 +117,17 @@ class CrossValidation:
             for fold, (train_idx, val_idx) in enumerate(kf.split(X= self.dataframe, y = targets)):
                 self.dataframe.loc[val_idx, "kfold"] = fold
 
-        # TODO Add more type of prom type here.
 
+        #-------------------------------------------------------------------------------------
+        # TODO Add more type of prom type here.
+        #--------------------------------------------------------------------------------------
         else:
             raise Exception ("problem_type not understood")
 
         return self.dataframe
+
+        #EXERCISE: split in such a way that you keep the distribution of the values similar. for both single column and multiple column.
+        #
 
 
 if __name__ == "__main__":
