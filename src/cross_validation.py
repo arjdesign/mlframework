@@ -106,7 +106,7 @@ class CrossValidation:
         #--------------------------------------------------------------------------------------
         #Each sample can have more than one labels. 
         #Example: you have an image and it has multiple objects in it.
-        #a single target column should has multiple labls with a delimiter. 
+        #A single target column should have multiple labls with a delimiter. 
         #--------------------------------------------------------------------------------------
         elif self.problem_type == "multilabel_classification":
         
@@ -119,14 +119,14 @@ class CrossValidation:
 
 
         #-------------------------------------------------------------------------------------
-        # TODO Add more type of prom type here.
+        # TODO Add more type of problem_type here.
         #--------------------------------------------------------------------------------------
         else:
             raise Exception ("problem_type not understood")
 
         return self.dataframe
 
-        #EXERCISE: split in such a way that you keep the distribution of the values similar. for both single column and multiple column.
+        #TODO: split in such a way that you keep the distribution of the values similar. for both single column and multiple column.
         #
 
 
