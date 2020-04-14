@@ -1,0 +1,15 @@
+Binarization  001, 010, 011 and so on
+Label Encoding: represent each value by a number
+One hot Encoding. 001, 010, 100
+
+Dealing categorical values based on the model prospective instead od preprocessing.
+check paper here: https://arxiv.org/pdf/1604.06737.pdf
+This paper comes from the kaggle competition
+
+With relatively simple features authours had been able to be third place in the competition.
+
+EMbeding in NLP
+
+Norway --> [____________] fasttext, globe, word to vec
+
+For categorocal embedding: 

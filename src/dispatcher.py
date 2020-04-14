@@ -1,5 +1,6 @@
 from sklearn import ensemble
-import xgboost as xgb 
+import xgboost as xgb
+from sklearn import linear_model 
 
 #ML MODELS
 MODELS = {
@@ -15,7 +16,12 @@ MODELS = {
     "xgboost": xgb.XGBRFClassifier(verbosity=2, 
         max_depth=4, 
         n_estimators=200, 
-        n_jobs=-1)
+        n_jobs=-1),
+
+    "logreg": linear_model.LogisticRegression(
+       n_jobs= -1 
+    )
+
 }
 
 #deep learning models:

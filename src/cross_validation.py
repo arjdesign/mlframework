@@ -8,7 +8,7 @@ Types of cross validation:
 K-fold
 Stratified K_fold
 Multilabel classification
-Regression Classification
+Regression - single_col_regression, multi_col_regression
 Holdout based validation
 
 In the sample dataset, it is binary classification
@@ -18,7 +18,7 @@ It splits the data but keep the ratio of the positive
 and negative data same in each fold. For example:
 if you have 20% positive sample on the training then you will 
 have 20% on the validation set too.
-
+utrerrrr
 """
 
 class CrossValidation:
@@ -85,6 +85,7 @@ class CrossValidation:
         #In timeseries if you use k-fold, you will be using data from future timestamp. It is 
         #not a good idea. It will overfit your model and you will get really nice validation score
         #but it doesnot mean anything.
+        #In case of time series data, set shuffle = False
 
         #When you have millions of dataset, then you can use holdout set. It is very 
         #expensive to do 5/10 fold cross validation with such a large dataset. The best way is to 
@@ -106,12 +107,24 @@ class CrossValidation:
         #--------------------------------------------------------------------------------------
         #Each sample can have more than one labels. 
         #Example: you have an image and it has multiple objects in it.
-        #A single target column should have multiple labls with a delimiter. 
+        #A single target column should have multiple labls with a delimiter. If you have multiple columns,
+        # combine the colums with comma diliminator.
+
+        #Example.
+        """
+        id  target
+        1,  32, 60
+        2,  50, 32, 15, 2
+        3,  1, 
+        """
+        
+        #create folds based on the counts of number of classes.
         #--------------------------------------------------------------------------------------
         elif self.problem_type == "multilabel_classification":
         
             if self.num_targets != 1:
                 raise Exception ("Invalid num of traget for this type of problem ")
+            #TODO: investigate
             targets = self.dataframe[self.target_cols[0]].apply(lambda x: len(str(x).split(self.multilabel_delimiter)))
             kf = model_selection.StratifiedKFold(n_splits=self.num_folds)
             for fold, (train_idx, val_idx) in enumerate(kf.split(X= self.dataframe, y = targets)):
@@ -119,7 +132,7 @@ class CrossValidation:
 
 
         #-------------------------------------------------------------------------------------
-        # TODO Add more type of problem_type here.
+        # TODO Add more problem_types here.
         #--------------------------------------------------------------------------------------
         else:
             raise Exception ("problem_type not understood")
