@@ -11,14 +11,27 @@ class ClassificationMetrics:
         }
 
     def __call__(self, metric, y_true, y_pred, y_proba=None):
+        #statisfy predict probability condition
+        #  for  logloss and auc score
         
         if metric not in self.metrics:
-            raise Exception("metrics not implemented")
-        
-        return self.metrics[metric](y_true=y_true, y_pred=y_pred )
-        
+            raise NotImplementedError("metrics not implemented")
 
-
+        if metric == "auc":
+            if y_proba is not None:
+                return self._auc(y_true=y_true, y_pred=y_proba)
+            else:
+                return self._auc(y_true=y_true, y_pred = y_pred)
+        
+        elif metric == "logloss":
+            if y_proba is not None:
+                return self._logloss(y_true=y_true, y_pred=y_proba)
+            else:
+                return self._logloss(y_true=y_true, y_pred= y_pred)
+        else:
+            return self.metrics[metric](y_true=y_true, y_pred=y_pred)
+        
+    
     @staticmethod
     def _accuracy(y_true, y_pred):
         return skmetrics.accuracy_score(y_true= y_true, y_pred = y_pred)
