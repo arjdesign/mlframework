@@ -1,4 +1,6 @@
 from sklearn import metrics as skmetrics
+#TODO: import metrics from other cool libraries and put it here.
+#or you can implement your own meterics as you wish.
 
 class ClassificationMetrics:
     def __init__(self):
@@ -21,13 +23,13 @@ class ClassificationMetrics:
             if y_proba is not None:
                 return self._auc(y_true=y_true, y_pred=y_proba)
             else:
-                return self._auc(y_true=y_true, y_pred = y_pred)
+                raise Exception('y_proba cannot be None for AUC')
         
         elif metric == "logloss":
             if y_proba is not None:
                 return self._logloss(y_true=y_true, y_pred=y_proba)
             else:
-                return self._logloss(y_true=y_true, y_pred= y_pred)
+                return Exception('y_proba cannot be none for logloss')
         else:
             return self.metrics[metric](y_true=y_true, y_pred=y_pred)
         
@@ -55,6 +57,11 @@ class ClassificationMetrics:
     @staticmethod
     def _logloss (y_true, y_pred):
         return skmetrics.log_loss(y_true=y_true, y_pred=y_pred)
+
+
+    # @staticmethod
+    # def some_cool_metric (*args):
+    #     return metrics (*args)
     
 
     
