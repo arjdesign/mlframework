@@ -1,5 +1,5 @@
 from sklearn import metrics as skmetrics
-#TODO: import metrics from other cool libraries and put it here.
+#TODO: import metrics from other cool libraries for multilabel and multicass classfication and put it here.
 #or you can implement your own meterics as you wish.
 
 class ClassificationMetrics:
@@ -9,8 +9,12 @@ class ClassificationMetrics:
             "auc": self._auc,
             "f1": self._f1,
             "recall": self._recall,
-            "precision": self._precision
+            "precision": self._precision,
+            "logloss": self._logloss
+            
         }
+
+        #__init__ for class and __call__ for object.
 
     def __call__(self, metric, y_true, y_pred, y_proba=None):
         #statisfy predict probability condition
